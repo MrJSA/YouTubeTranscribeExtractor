@@ -44,7 +44,8 @@ void ExportToFilePDF(HWND hWnd, const std::wstring& text);
 int ParseTimestampToSeconds(const std::wstring& tsStr);
 std::vector<std::wstring> WordWrap(const std::wstring& text, size_t maxCharsLine);
 std::string EscapePDFText(const std::wstring& wstr);
-std::wstring GetScriptPath();
+bool ExtractResource(int resourceId, const std::wstring& outputPath);
+std::wstring GetHelperCommand(const std::wstring& escapedUrl, bool& outIsScript);
 std::wstring FetchTranscriptFromURL(const std::wstring& urlOrId);
 
 struct TranscriptLine {
@@ -993,32 +994,68 @@ void ExportToFilePDF(HWND hWnd, const std::wstring& text) {
     }
 }
 
-std::wstring GetScriptPath() {
+bool ExtractResource(int resourceId, const std::wstring& outputPath) {
+    HRSRC hRes = FindResourceW(NULL, MAKEINTRESOURCEW(resourceId), (LPCWSTR)RT_RCDATA);
+    if (!hRes) return false;
+    
+    HGLOBAL hData = LoadResource(NULL, hRes);
+    if (!hData) return false;
+    
+    LPVOID pData = LockResource(hData);
+    DWORD size = SizeofResource(NULL, hRes);
+    if (!pData || size == 0) return false;
+    
+    std::ofstream outFile(outputPath.c_str(), std::ios::out | std::ios::binary);
+    if (!outFile.is_open()) return false;
+    
+    outFile.write(reinterpret_cast<const char*>(pData), size);
+    outFile.close();
+    return true;
+}
+
+std::wstring GetHelperCommand(const std::wstring& escapedUrl, bool& outIsScript) {
     wchar_t exePath[MAX_PATH];
     GetModuleFileNameW(NULL, exePath, MAX_PATH);
-    
     std::wstring exeDir(exePath);
     size_t lastSlash = exeDir.find_last_of(L"\\/");
     if (lastSlash != std::wstring::npos) {
         exeDir = exeDir.substr(0, lastSlash);
     }
     
-    // Check if get_transcript.py is in the same directory
+    // 1. Check if get_transcript.py is in the same directory (development flow)
     std::wstring pathSame = exeDir + L"\\get_transcript.py";
     DWORD attribSame = GetFileAttributesW(pathSame.c_str());
     if (attribSame != INVALID_FILE_ATTRIBUTES && !(attribSame & FILE_ATTRIBUTE_DIRECTORY)) {
-        return pathSame;
+        outIsScript = true;
+        return L"py \"" + pathSame + L"\" \"" + escapedUrl + L"\"";
     }
     
-    // Check parent directory (for cmake-build-debug builds)
+    // 2. Check parent directory (for cmake-build-debug builds in CLion)
     std::wstring pathParent = exeDir + L"\\..\\get_transcript.py";
     DWORD attribParent = GetFileAttributesW(pathParent.c_str());
     if (attribParent != INVALID_FILE_ATTRIBUTES && !(attribParent & FILE_ATTRIBUTE_DIRECTORY)) {
-        return pathParent;
+        outIsScript = true;
+        return L"py \"" + pathParent + L"\" \"" + escapedUrl + L"\"";
     }
     
-    // Default fallback
-    return L"get_transcript.py";
+    // 3. Fallback to extracting the embedded get_transcript.exe from resources
+    wchar_t tempPath[MAX_PATH];
+    GetTempPathW(MAX_PATH, tempPath);
+    std::wstring helperPath = std::wstring(tempPath) + L"YouTubeTranscribeExtractor_get_transcript.exe";
+    
+    bool exists = false;
+    DWORD attribTemp = GetFileAttributesW(helperPath.c_str());
+    if (attribTemp != INVALID_FILE_ATTRIBUTES && !(attribTemp & FILE_ATTRIBUTE_DIRECTORY)) {
+        exists = true;
+    }
+    
+    if (!exists) {
+        // Try to extract
+        ExtractResource(101, helperPath);
+    }
+    
+    outIsScript = false;
+    return L"\"" + helperPath + L"\" \"" + escapedUrl + L"\"";
 }
 
 std::wstring FetchTranscriptFromURL(const std::wstring& urlOrId) {
@@ -1032,15 +1069,17 @@ std::wstring FetchTranscriptFromURL(const std::wstring& urlOrId) {
         }
     }
     
-    std::wstring scriptPath = GetScriptPath();
-    
-    // Command line command using py launcher and redirecting stderr to stdout
-    std::wstring cmd = L"py \"" + scriptPath + L"\" \"" + escaped + L"\" 2>&1";
+    bool isScript = false;
+    std::wstring cmd = L"\"" + GetHelperCommand(escaped, isScript) + L" 2>&1\"";
     
     // Launch process and read raw UTF-8 bytes from the pipe
     FILE* fp = _wpopen(cmd.c_str(), L"r");
     if (!fp) {
-        return L"ERROR: Failed to launch script. Make sure Python and youtube-transcript-api are installed.";
+        if (isScript) {
+            return L"ERROR: Failed to launch script. Make sure Python and youtube-transcript-api are installed.";
+        } else {
+            return L"ERROR: Failed to launch embedded helper executable.";
+        }
     }
     
     std::string outputBytes;
@@ -1065,7 +1104,7 @@ std::wstring FetchTranscriptFromURL(const std::wstring& urlOrId) {
         if (output.find(L"ERROR:") != std::wstring::npos) {
             return output;
         }
-        return L"ERROR: Python script execution failed.\n\nCommand:\n" + cmd + L"\n\nExit code: " + std::to_wstring(exitCode) + L"\n\nOutput Details:\n" + output;
+        return L"ERROR: execution failed.\n\nCommand:\n" + cmd + L"\n\nExit code: " + std::to_wstring(exitCode) + L"\n\nOutput Details:\n" + output;
     }
     
     return output;

@@ -1,0 +1,2 @@
+// Resource script to embed the compiled Python script executable
+101 RCDATA "dist\\get_transcript.exe"

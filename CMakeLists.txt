@@ -3,5 +3,5 @@ project(YouTubeTranscribeExtractor)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(YouTubeTranscribeExtractor WIN32 main.cpp)
+add_executable(YouTubeTranscribeExtractor WIN32 main.cpp resources.rc)
 target_link_libraries(YouTubeTranscribeExtractor PRIVATE comctl32 comdlg32 dwmapi)
