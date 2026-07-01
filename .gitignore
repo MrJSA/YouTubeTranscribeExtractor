@@ -25,5 +25,5 @@ test_encoding*
 
 # PyInstaller build directories
 build/
-dist/
+dist/*
 !dist/get_transcript.exe
