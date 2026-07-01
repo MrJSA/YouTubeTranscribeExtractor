@@ -1,0 +1,24 @@
+# CLion & JetBrains IDE files
+.idea/
+*.iml
+
+# CMake build directories & logs
+cmake-build-debug/
+cmake-build-release/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CMakeSettings.json
+
+# Compiled binaries and build outputs
+*.exe
+*.o
+*.obj
+*.dll
+*.lib
+*.a
+*.so
+*.dylib
+
+# Temporary / Scratch Files
+test_encoding*
