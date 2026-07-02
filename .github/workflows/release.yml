@@ -10,7 +10,17 @@ permissions:
 
 jobs:
   build-and-release:
-    runs-on: windows-latest
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: YouTubeTranscribeExtractor-Windows.zip
+          - os: macos-latest
+            artifact_name: YouTubeTranscribeExtractor-macOS.dmg
+          - os: ubuntu-latest
+            artifact_name: YouTubeTranscribeExtractor-Linux.tar.gz
 
     steps:
       - name: Checkout Code
@@ -29,6 +39,17 @@ jobs:
         run: |
           pyinstaller --onefile get_transcript.py
 
+      - name: Install Linux Build Dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libgl1-mesa-dev libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xinerama0
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.5.3'
+
       - name: Configure CMake
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
@@ -37,9 +58,35 @@ jobs:
         run: |
           cmake --build build --config Release
 
-      - name: Create GitHub Release and Upload Binary
+      # Packaging - Windows
+      - name: Package Windows Release
+        if: matrix.os == 'windows-latest'
+        run: |
+          mkdir publish
+          copy build\Release\YouTubeTranscribeExtractor.exe publish\
+          windeployqt --release --no-translations --compiler-runtime publish\YouTubeTranscribeExtractor.exe
+          Compress-Archive -Path publish\* -DestinationPath YouTubeTranscribeExtractor-Windows.zip
+        shell: pwsh
+
+      # Packaging - macOS
+      - name: Package macOS Release
+        if: matrix.os == 'macos-latest'
+        run: |
+          macdeployqt build/YouTubeTranscribeExtractor.app -dmg
+          mv build/YouTubeTranscribeExtractor.dmg YouTubeTranscribeExtractor-macOS.dmg
+
+      # Packaging - Linux
+      - name: Package Linux Release
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir publish
+          cp build/YouTubeTranscribeExtractor publish/
+          tar -czvf YouTubeTranscribeExtractor-Linux.tar.gz -C publish .
+
+      # Upload to GitHub Release
+      - name: Create GitHub Release and Upload Binaries
         uses: softprops/action-gh-release@v2
         with:
-          files: build/Release/YouTubeTranscribeExtractor.exe
+          files: ${{ matrix.artifact_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
