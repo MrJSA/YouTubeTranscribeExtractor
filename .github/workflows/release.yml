@@ -18,10 +18,13 @@ jobs:
         include:
           - os: windows-latest
             artifact_name: YouTubeTranscribeExtractor-Windows.zip
+            arch: win64_msvc2022_64
           - os: macos-latest
             artifact_name: YouTubeTranscribeExtractor-macOS.dmg
+            arch: clang_64
           - os: ubuntu-latest
             artifact_name: YouTubeTranscribeExtractor-Linux.tar.gz
+            arch: gcc_64
 
     steps:
       - name: Checkout Code
@@ -49,7 +52,8 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.8.0'
+          version: '6.11.1'
+          arch: ${{ matrix.arch }}
 
       - name: Configure CMake
         run: |
