@@ -27,6 +27,16 @@ if(APPLE)
         MACOSX_BUNDLE_BUNDLE_NAME "YouTubeTranscribeExtractor"
         MACOSX_BUNDLE_GUI_IDENTIFIER "com.joshua.YouTubeTranscribeExtractor"
     )
+    
+    # Strip removed legacy AGL framework from Qt6 transitive dependencies to prevent linker errors on macOS 14+
+    if(TARGET Qt6::Gui)
+        get_target_property(qt6_gui_libs Qt6::Gui INTERFACE_LINK_LIBRARIES)
+        if(qt6_gui_libs)
+            list(REMOVE_ITEM qt6_gui_libs "-framework AGL")
+            list(REMOVE_ITEM qt6_gui_libs "AGL::AGL")
+            set_target_properties(Qt6::Gui PROPERTIES INTERFACE_LINK_LIBRARIES "${qt6_gui_libs}")
+        endif()
+    endif()
 endif()
 
 target_link_libraries(YouTubeTranscribeExtractor PRIVATE Qt6::Widgets)

@@ -24,7 +24,7 @@ jobs:
             arch: clang_64
           - os: ubuntu-latest
             artifact_name: YouTubeTranscribeExtractor-Linux.tar.gz
-            arch: gcc_64
+            arch: linux_gcc_64
 
     steps:
       - name: Checkout Code
