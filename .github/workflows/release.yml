@@ -52,7 +52,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.11.1'
+          version: '6.7.2'
           arch: ${{ matrix.arch }}
 
       - name: Configure CMake
