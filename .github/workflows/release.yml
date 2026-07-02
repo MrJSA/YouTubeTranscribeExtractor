@@ -58,7 +58,28 @@ jobs:
       - name: Patch Qt AGL dependency on macOS
         if: matrix.os == 'macos-latest'
         run: |
-          find "${{ github.workspace }}/../Qt/6.7.2/macos/lib/cmake" -type f -name "*.cmake" -exec sed -i '' 's/-framework AGL//g' {} +
+          python3 -c "
+          import os, re
+          cmake_dir = os.path.abspath(os.path.join(os.environ['GITHUB_WORKSPACE'], '../Qt/6.7.2/macos/lib/cmake'))
+          print('Scanning:', cmake_dir)
+          for root, dirs, files in os.walk(cmake_dir):
+              for file in files:
+                  if file.endswith('.cmake'):
+                      fp = os.path.join(root, file)
+                      with open(fp, 'r', encoding='utf-8', errors='ignore') as f:
+                          c = f.read()
+                      if 'AGL' in c:
+                          print('Found in:', fp)
+                          for l in c.splitlines():
+                              if 'AGL' in l:
+                                  print('  Before:', l)
+                          c = c.replace('-framework AGL', '')
+                          c = c.replace('/System/Library/Frameworks/AGL.framework', '')
+                          c = re.sub(r'\bAGL\b', '', c)
+                          c = re.sub(r';+', ';', c)
+                          with open(fp, 'w', encoding='utf-8') as f:
+                              f.write(c)
+          "
 
       - name: Configure CMake
         run: |
