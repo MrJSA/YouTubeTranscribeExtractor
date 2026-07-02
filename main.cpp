@@ -332,7 +332,7 @@ public:
         
         // Signal Connections
         connect(m_inputEdit, &QTextEdit::textChanged, this, &MainWindow::onTextChanged);
-        connect(m_paragraphCheck, &QCheckBox::stateChanged, this, &MainWindow::onCheckboxChanged);
+        connect(m_paragraphCheck, &QCheckBox::checkStateChanged, this, &MainWindow::onCheckboxChanged);
         connect(m_fetchBtn, &QPushButton::clicked, this, &MainWindow::onFetchClicked);
         connect(m_cleanBtn, &QPushButton::clicked, this, &MainWindow::onCleanClicked);
         connect(m_copyBtn, &QPushButton::clicked, this, &MainWindow::onCopyClicked);
