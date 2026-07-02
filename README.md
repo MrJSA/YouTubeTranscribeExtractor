@@ -11,6 +11,16 @@ A high-performance, modern cross-platform desktop application to retrieve, clean
 
 ---
 
+## 📦 How to Install & Run
+
+1. Head over to the **[Releases](https://github.com/username/YouTubeTranscribeExtractor/releases)** page.
+2. Download the package for your operating system:
+   * **Windows:** Download `YouTubeTranscribeExtractor-Windows.zip`, extract, and run `YouTubeTranscribeExtractor.exe`.
+   * **macOS:** Download `YouTubeTranscribeExtractor-macOS.dmg`, double-click to mount, and drag the app to your `Applications` folder.
+   * **Linux:** Download `YouTubeTranscribeExtractor-Linux.tar.gz`, extract, and run `YouTubeTranscribeExtractor`.
+
+---
+
 ## ✨ Key Features
 
 | Feature | Description |
@@ -20,16 +30,6 @@ A high-performance, modern cross-platform desktop application to retrieve, clean
 | **🧠 Smart Paragraphing** | Automatically inserts paragraph breaks where speaker pauses exceed 10 seconds. |
 | **📄 PDF & TXT Export** | Export fully wrapped transcripts straight to `.txt` files or formatted `.pdf` documents via Qt's native layout engine. |
 | **🔌 Cross-Platform Standalone** | Compiles to native executables on Windows (`.exe`), macOS (`.app` / `.dmg`), and Linux (`.tar.gz`). |
-
----
-
-## 📦 How to Install & Run
-
-1. Head over to the **[Releases](https://github.com/username/YouTubeTranscribeExtractor/releases)** page.
-2. Download the package for your operating system:
-   * **Windows:** Download `YouTubeTranscribeExtractor-Windows.zip`, extract, and run `YouTubeTranscribeExtractor.exe`.
-   * **macOS:** Download `YouTubeTranscribeExtractor-macOS.dmg`, double-click to mount, and drag the app to your `Applications` folder.
-   * **Linux:** Download `YouTubeTranscribeExtractor-Linux.tar.gz`, extract, and run `YouTubeTranscribeExtractor`.
 
 ---
 
