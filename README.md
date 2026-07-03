@@ -21,6 +21,10 @@ A high-performance, modern cross-platform desktop application to retrieve, clean
 
 ---
 
+<img alt="image" src="[https://github.com/user-attachments/assets/eba18a57-5310-43f7-933c-3ef8bf65032c](https://github.com/MrJSA/YouTubeTranscribeExtractor/blob/master/.github/screenshot.png)" />
+
+---
+
 ## ✨ Key Features
 
 | Feature | Description |
