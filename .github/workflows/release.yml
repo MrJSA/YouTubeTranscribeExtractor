@@ -96,8 +96,8 @@ jobs:
       - name: Package Windows Release
         if: matrix.os == 'windows-latest'
         run: |
-          # Download Enigma Virtual Box setup
-          Invoke-WebRequest -Uri "https://enigmaprotector.com/assets/files/enigmavb.exe" -OutFile "enigmavb_setup.exe"
+          # Download Enigma Virtual Box setup (using curl to avoid PowerShell progress bar render hangs)
+          curl -L -o enigmavb_setup.exe https://enigmaprotector.com/assets/files/enigmavb.exe
           
           # Install Enigma Virtual Box silently
           Start-Process -FilePath ".\enigmavb_setup.exe" -ArgumentList "/S" -Wait -NoNewWindow
