@@ -18,7 +18,7 @@ endif()
 
 configure_file(resources.qrc.in ${CMAKE_CURRENT_BINARY_DIR}/resources.qrc)
 
-add_executable(YouTubeTranscribeExtractor main.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.qrc)
+add_executable(YouTubeTranscribeExtractor WIN32 main.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.qrc)
 
 # Configure macOS Bundle packaging
 if(APPLE)
