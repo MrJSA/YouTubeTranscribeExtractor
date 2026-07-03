@@ -15,7 +15,7 @@ A high-performance, modern cross-platform desktop application to retrieve, clean
 
 1. Head over to the **[Releases](https://github.com/username/YouTubeTranscribeExtractor/releases)** page.
 2. Download the package for your operating system:
-   * **Windows:** Download `YouTubeTranscribeExtractor-Windows.zip`, extract, and run `YouTubeTranscribeExtractor.exe`.
+   * **Windows:** Download `YouTubeTranscribeExtractor-Windows.exe` and run it directly.
    * **macOS:** Download `YouTubeTranscribeExtractor-macOS.dmg`, double-click to mount, and drag the app to your `Applications` folder.
    * **Linux:** Download `YouTubeTranscribeExtractor-Linux.tar.gz`, extract, and run `YouTubeTranscribeExtractor`.
 
